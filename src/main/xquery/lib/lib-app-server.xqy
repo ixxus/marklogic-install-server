@@ -12,6 +12,7 @@ declare namespace conf = "http://www.marklogic.com/ps/install/config.xqy";
     <servers>
         <server type="http"   name="Content" port="9000" group="Default" database="Content"   root="/" modules="0">
             <url-rewriter>rewrite.xqy</url-rewriter>
+            <error-handler>error.xqy</error-handler>
         </server>
         <server type="xdb"    name="Content" port="9001" group="Default" database="Content"   root="/" modules="Modules"/>
         <server type="webdav" name="Content" port="9002" group="Default" database="Content"   root="/" modules="0"/>
@@ -47,6 +48,10 @@ declare function  inst-app:mk-server-name($config, $server)
 
 declare function inst-app:create-server($install-config, $server as element(), $create as xs:boolean)
 {
+    let $_ := xdmp:log("******************* SERVER CONFIG ***************************")
+    let $_ := xdmp:log($server)
+    let $_ := xdmp:log("*************************************************************")
+
     let $server-name := mk-server-name($install-config, $server)
     let $LOG := xdmp:log(text{"Creating Server:", $server-name})
     let $server-port := $server/@port
@@ -123,6 +128,8 @@ declare function inst-app:create-server($install-config, $server as element(), $
         else
             $config
 
+    let $config := admin:save-configuration-without-restart($config)
+
     (::: Set URL Rewriter :)
     let $config := admin:get-configuration()
     let $rewriter := $server/conf:url-rewriter
@@ -133,7 +140,19 @@ declare function inst-app:create-server($install-config, $server as element(), $
         else
             $config
     
-    return admin:save-configuration-without-restart($config)
+    let $_ := admin:save-configuration-without-restart($config)
+
+    (::: Set error handler :)
+    let $config   := admin:get-configuration()
+    let $handler  := $server/conf:error-handler
+    let $config   := if($handler) then
+                         let $handler := $handler/fn:string()
+                         let $LOG := xdmp:log(text{"Error Handler URL = ",$handler})
+                         return admin:appserver-set-error-handler($config, $server-id, $handler)
+                     else
+                        $config
+    return
+        admin:save-configuration-without-restart($config)
 };
 
 declare function inst-app:delete-server($install-config, $server as element()*)
