@@ -3,7 +3,7 @@
 
     <groupId>com.marklogic</groupId>
     <artifactId>marklogic-install-server</artifactId>
-    <version>1.0.5-SNAPSHOT</version>
+    <version>1.0.6-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>MarkLogic Install Server</name>
@@ -34,9 +34,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git@github.com:gphaydon/marklogic-install-server.git</connection>
-        <developerConnection>scm:git:git@github.com:gphaydon/marklogic-install-server.git</developerConnection>
-        <url>http://github.com/gphaydon/marklogic-install-server/</url>
+        <connection>scm:git:git@github.com:PressAssociation/marklogic-install-server.git</connection>
+        <developerConnection>scm:git:git@github.com:PressAssociation/marklogic-install-server.git</developerConnection>
+        <url>http://github.com/PressAssociation/marklogic-install-server/</url>
     </scm>
 
     <distributionManagement>
