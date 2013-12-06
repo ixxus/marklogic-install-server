@@ -10,13 +10,15 @@ declare namespace conf = "http://www.marklogic.com/ps/install/config.xqy";
 
 (::: INPUT :::
     <database name="DatabaseName">
-        <field name="" include-root="">
+        <field name="" include-root="" value-searches="true" word-searches="true" value-positions="true" fast-case-sensitive-searches="true" ...>
             <include namespace="" localname="" weight="" attribute-namespace="" attribute-localname="" attribute-value=""/>
             <include namespace="" localname="" weight="" attribute-namespace="" attribute-localname="" attribute-value=""/>
             <exclude namespace="" localname=""/>
             <exclude namespace="" localname=""/>
             <lexicon collation=""/>
-    </database>  
+    </database>
+    
+    any admin:database-set-field-* function can appear as an attribute on field element, with common prefix removed.
 :::)
 
 declare function  inst-fld:install-fields($install-config)
@@ -42,7 +44,14 @@ declare function inst-fld:add-field($install-config as node(), $database as elem
     for $field in $fields
         let $config := admin:get-configuration()
         let $newfield := admin:database-field($field/@name, $field/@include-root)
-        let $config := admin:database-add-field($config, $database, $newfield)
+        let $config := try {
+            admin:database-add-field($config, $database, $newfield)
+        } catch($e) {
+            let $LOG := xdmp:log(fn:concat('field ', $field/@name, ' exists: replacing'))
+            let $config := admin:database-delete-field($config, $database, $field/@name)
+            let $config := admin:database-add-field($config, $database, $newfield)
+            return $config
+        }
         let $included-elements := 
             for $include in $field/conf:include
                 return admin:database-included-element($include/@element-namespace, $include/@localname, $include/@weight, 
@@ -63,6 +72,12 @@ declare function inst-fld:add-field($install-config as node(), $database as elem
             else
                 $config
                 
+        let $_ := 
+            for $attribute in $field/@* except ($field/@name)
+            let $function-name := fn:concat('admin:', 'database-set-field-', fn:local-name($attribute))
+            where fn:function-available($function-name, 4)
+            return xdmp:set($config, xdmp:apply(xdmp:function(xs:QName($function-name)), $config, $database, $field/@name, $attribute))
+
         let $config := 
             if ($field/conf:lexicon) then
                 admin:database-add-field-word-lexicon($config, $database, $field/@name, 
