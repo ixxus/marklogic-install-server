@@ -10,10 +10,11 @@ declare namespace conf = "http://www.marklogic.com/ps/install/config.xqy";
 
 (::: INPUT :::
     <database name="DatabaseName">
-        <element-word-lexicon 	scalar-type="string" namespace="Namespace" localname="ElementName"/>
-        <element-range-index  	scalar-type="string" namespace="Namespace" localname="ElementName"/>
-        <attrubute-word-lexicon scalar-type="string" parent-namespace="NameSpace" parent-localname="ElementName" namespace="Namespace" localname="AttributeName"/>
-        <attribute-range-index	scalar-type="string" parent-namespace="NameSpace" parent-localname="ElementName" namespace="Namespace" localname="AttributeName"/>
+        <element-word-lexicon 	scalar-type="string" namespace="Namespace" localname="ElementName" range-value-positions="false"/>
+        <element-range-index  	scalar-type="string" namespace="Namespace" localname="ElementName" range-value-positions="false"/>
+        <attrubute-word-lexicon scalar-type="string" parent-namespace="NameSpace" parent-localname="ElementName" namespace="Namespace" localname="AttributeName" range-value-positions="false"/>
+        <attribute-range-index	scalar-type="string" parent-namespace="NameSpace" parent-localname="ElementName" namespace="Namespace" localname="AttributeName" range-value-positions="false"/>
+        <range-field-index	    scalar-type="string" fieldname="FieldName" range-value-positions="false"/>
         
         <geospatial-element-pair-index parent-namespace="" parent-localname="" lat-namespace="" lat-localname="" lon-namespace="" lon-localname="" coordinate-system="" range-value-positions=""/>
         <geospatial-element-attribute-pair-index parent-namespace="" parent-localname="" lat-namespace="" lat-localname="" lon-namespace="" lon-localname="" coordinate-system="" range-value-positions=""/>
@@ -42,6 +43,7 @@ declare function  inst-idx:install-or-uninstall-indices($install-config, $add)
         $database/conf:attribute-word-lexicon,
         $database/conf:element-range-index,
         $database/conf:attribute-range-index,
+        $database/conf:range-field-index,
         $database/conf:geospatial-element-pair-index,
         $database/conf:geospatial-element-attribute-pair-index,
         $database/conf:geospatial-element-child-index,
@@ -120,7 +122,18 @@ declare function inst-idx:add-or-remove-index($install-config, $database, $insta
                     else
                         inst-idx:remove-range-element-attribute-index($database, $scalar-type, $parent-namespace, $parent-localname, $namespace, $localname, $collation, $range-value-positions)
                     
+
+                case element(conf:range-field-index) return
+                    let $fieldname              := inst:validate-string("Database/Index", "Attribute: fieldname",           $install-index/@fieldname, ()) 
+                    let $scalar-type            := inst:validate-string("Database/Index", "Attribute: scalar-type",         $install-index/@scalar-type, ())
+                    let $collation              := inst:validate-string("Database/Index", "Attribute: collation",           $install-index/@collation, $DEFAULT-COLLATION)
+                    return
+                    if ($add) then
+                        inst-idx:add-range-field-index($database, $scalar-type, $fieldname, $collation, $range-value-positions)
+                    else
+                        inst-idx:remove-range-field-index($database, $scalar-type, $fieldname, $collation, $range-value-positions)
                   
+
                 case element(conf:geospatial-element-pair-index) return
                     let $parent-namespace       := inst:validate-string("Database/Index", "Attribute: parent-namespace",    $install-index/@parent-namespace, $DEFAULT-COORDINATE-SYSTEM)
                     let $parent-localname       := inst:validate-string("Database/Index", "Attribute: parent-localname",    $install-index/@parent-localname, ())
@@ -384,6 +397,30 @@ declare function inst-idx:remove-range-element-attribute-index($database, $scala
     let $config :=
         try { admin:database-delete-range-element-attribute-index($config, $database, $index) }
         catch ($e) {(xdmp:log("skipping remove-range-element-attribute-index(), not present"), $config)}
+    let $config := admin:save-configuration($config)
+    return $index
+};
+
+declare function inst-idx:add-range-field-index($database, $scalar-type, $fieldname, $collation, $range-value-positions)
+{
+    let $LOG := xdmp:log(text{"Inside: add-range-field-index()"})
+    let $config := admin:get-configuration()
+    let $index := admin:database-range-field-index($scalar-type, $fieldname, $collation, $range-value-positions)
+    let $config :=
+        try { admin:database-add-range-field-index($config, $database, $index) }
+        catch ($e) {(xdmp:log("skipping add-range-field-index(), already present"), $config)}
+    let $config := admin:save-configuration($config)
+    return $index
+};
+
+declare function inst-idx:remove-range-field-index($database, $scalar-type, $fieldname, $collation, $range-value-positions)
+{
+    let $LOG := xdmp:log(text{"Inside: remove-range-field-index()"})
+    let $config := admin:get-configuration()
+    let $index := admin:database-range-field-index($scalar-type, $fieldname, $collation, $range-value-positions)
+    let $config :=
+        try { admin:database-delete-range-element-attribute-index($config, $database, $index) }
+        catch ($e) {(xdmp:log("skipping remove-range-field-index(), not present"), $config)}
     let $config := admin:save-configuration($config)
     return $index
 };
