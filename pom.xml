@@ -3,7 +3,7 @@
 
     <groupId>com.marklogic</groupId>
     <artifactId>marklogic-install-server</artifactId>
-    <version>1.0.8-SNAPSHOT</version>
+    <version>1.0.8</version>
     <packaging>jar</packaging>
 
     <name>MarkLogic Install Server</name>
@@ -34,20 +34,16 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git@github.com:PressAssociation/marklogic-install-server.git</connection>
-        <developerConnection>scm:git:git@github.com:PressAssociation/marklogic-install-server.git</developerConnection>
-        <url>http://github.com/PressAssociation/marklogic-install-server/</url>
+        <connection>git@github.com:chudson-ixxus/marklogic-install-server.git</connection>
+        <developerConnection>git@github.com:chudson-ixxus/marklogic-install-server.git</developerConnection>
+        <url>https://github.com/chudson-ixxus/marklogic-install-server</url>
     </scm>
 
     <distributionManagement>
         <repository>
-            <id>pressassociation.releases</id>
-            <url>http://nexus.howden.press.net/nexus/content/repositories/releases</url>
+            <id>thirdparty</id>
+            <url>https://inexus.ixxus.co.uk/nexus/content/repositories/thirdparty</url>
         </repository>
-        <snapshotRepository>
-            <id>pressassociation.snapshots</id>
-            <url>http://nexus.howden.press.net/nexus/content/repositories/snapshots</url>
-        </snapshotRepository>
     </distributionManagement>
 
     <prerequisites>
