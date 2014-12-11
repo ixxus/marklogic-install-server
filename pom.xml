@@ -36,7 +36,7 @@
     <scm>
         <connection>git@github.com:chudson-ixxus/marklogic-install-server.git</connection>
         <developerConnection>git@github.com:chudson-ixxus/marklogic-install-server.git</developerConnection>
-        <url>https://github.com/chudson-ixxus/marklogic-install-server</url>
+        <url>git@github.com:chudson-ixxus/marklogic-install-server.git</url>
     </scm>
 
     <distributionManagement>
