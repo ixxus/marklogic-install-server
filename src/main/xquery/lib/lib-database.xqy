@@ -96,15 +96,15 @@ declare function inst-db:create-databases($install-config)
             inst-db:create-database($database-name)
 };
 
-declare function  inst-db:create-forest($forest-name)
+declare function  inst-db:create-forest($forest-name, $forest-dir)
 {
-    let $LOG := xdmp:log(text{"Creating Forest:", $forest-name})
+    let $LOG := xdmp:log(text{"Creating Forest:", $forest-name, " data dir:", $forest-dir})
     let $config := admin:get-configuration()
     return
     if (admin:forest-exists($config, $forest-name)) then
         ()
     else
-        let $config := admin:forest-create($config, $forest-name, xdmp:host(), ())
+        let $config := admin:forest-create($config, $forest-name, xdmp:host(), $forest-dir)
         return admin:save-configuration($config)
 };
 
@@ -113,7 +113,7 @@ declare function inst-db:create-forests($install-config)
     for $forest in $install-config/inst-conf:database/inst-conf:forest
         let $forest-name := inst-db:mk-forest-name($install-config, $forest)
         return
-            inst-db:create-forest($forest-name)
+            inst-db:create-forest($forest-name, $forest/inst-conf:forest-directory/text())
 };
 
 declare function  inst-db:attach-forest($database-name, $forest-name)
