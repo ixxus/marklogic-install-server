@@ -3,7 +3,7 @@
 
     <groupId>com.ixxus.marklogic</groupId>
     <artifactId>marklogic-install-server</artifactId>
-    <version>1.0.8-SNAPSHOT</version>
+    <version>1.0.8</version>
     <packaging>jar</packaging>
 
     <name>MarkLogic Install Server</name>
@@ -37,7 +37,8 @@
         <connection>scm:git:git@github.com:chudson-ixxus/marklogic-install-server.git</connection>
         <developerConnection>scm:git:git@github.com:chudson-ixxus/marklogic-install-server.git</developerConnection>
         <url>https://github.com/chudson-ixxus/marklogic-install-server</url>
-    </scm>
+      <tag>marklogic-install-server-1.0.8</tag>
+  </scm>
 
     <distributionManagement>
         <repository>
