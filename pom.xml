@@ -34,9 +34,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git@github.com:chudson-ixxus/marklogic-install-server.git</connection>
-        <developerConnection>scm:git:git@github.com:chudson-ixxus/marklogic-install-server.git</developerConnection>
-        <url>https://github.com/chudson-ixxus/marklogic-install-server</url>
+        <connection>scm:git:git@github.com:richhart/marklogic-install-server.git</connection>
+        <developerConnection>scm:git:git@github.com:richhart/marklogic-install-server.git</developerConnection>
+        <url>https://github.com/richhart/marklogic-install-server</url>
       <tag>HEAD</tag>
   </scm>
 
@@ -120,8 +120,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
 				<version>3.2</version>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>

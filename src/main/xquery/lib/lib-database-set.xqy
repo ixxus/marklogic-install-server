@@ -74,8 +74,16 @@ declare namespace inst-conf = "http://www.marklogic.com/ps/install/config.xqy";
     <set name="word-query-trailing-wildcard-word-positions"  value="(true|false)"/>
     <set name="word-query-two-character-searches"            value="(true|false)"/>
     <set name="word-query-word-searches"                     value="(true|false)"/>
-    <set name="word-searches"                                value="(true|false)"/> 
-
+    <set name="word-searches"                                value="(true|false)"/>
+    <set name="triple-index"                                 value="(true|false)"/>
+    <set name="in-memory-triple-index-size"                  value="" />
+    <set name="triple-positions"                             value="(true|false)"/>
+    <set name="triple-cache-size"                            value="" />
+    <set name="triple-cache-partitions"                      value="" />
+    <set name="triple-cache-timeout"                         value="" />
+    <set name="triple-value-cache-timeout"                   value="" />
+    <set name="triple-value-cache-size"                      value="" />
+    <set name="triple-value-cache-partitions"                value="" />
     </database>
 
     <database/>
@@ -105,6 +113,7 @@ declare function  inst-db-set:do-database-set-1($database-name, $set)
     let $LOG := xdmp:log(text{"Setting Property:", $name, "in Database:", $database-name, "to:", $value})
     
     let $config := admin:get-configuration()
+    let $group-id := admin:group-get-id($config, "Default")
     let $config := 
         try {
              if ("attribute-value-positions"                    eq $name) then admin:database-set-attribute-value-positions($config, $database-id, xs:boolean($value))
@@ -133,7 +142,16 @@ declare function  inst-db-set:do-database-set-1($database-name, $set)
         else if ("inherit-permissions"                          eq $name) then admin:database-set-inherit-permissions($config, $database-id, xs:boolean($value))
         else if ("inherit-quality"                              eq $name) then admin:database-set-inherit-quality($config, $database-id, xs:boolean($value))
         else if ("journal-size"                                 eq $name) then admin:database-set-journal-size($config, $database-id, xs:unsignedInt($value))
-        else    $config                                  
+        else if ("triple-index"                                 eq $name) then admin:database-set-triple-index($config, $database-id, xs:boolean($value))
+        else if ("triple-positions"                             eq $name) then admin:database-set-triple-positions($config, $database-id, xs:boolean($value))
+        else if ("in-memory-triple-index-size"                  eq $name) then admin:database-set-in-memory-triple-index-size($config, $database-id, xs:unsignedInt($value))
+        else if ("triple-cache-size"                            eq $name) then admin:group-set-triple-cache-size($config, $group-id, xs:unsignedInt($value))
+        else if ("triple-cache-partitions"                      eq $name) then admin:group-set-triple-cache-partitions($config, $group-id, xs:unsignedInt($value))
+        else if ("triple-cache-timeout"                         eq $name) then admin:group-set-triple-cache-timeout($config, $group-id, xs:unsignedInt($value))
+        else if ("triple-value-cache-timeout"                   eq $name) then admin:group-set-triple-value-cache-timeout($config, $group-id, xs:unsignedInt($value))
+        else if ("triple-value-cache-size"                      eq $name) then admin:group-set-triple-value-cache-size($config, $group-id, xs:unsignedInt($value))
+        else if ("triple-value-cache-partitions"                eq $name) then admin:group-set-triple-value-cache-partitions($config, $group-id, xs:unsignedInt($value))
+        else    $config
         }
         catch ($e) {(xdmp:log(text{"### Skipping setting database property:",$name,"(may be an invalid value)->",$value}), $config)}
         
@@ -145,7 +163,7 @@ declare function  inst-db-set:do-database-set-2($database-name, $set)
     let $database-id := xdmp:database($database-name)
     let $name  := $set/@name
     let $value := $set/@value
-    
+
     let $LOG := xdmp:log(text{"Setting Property:", $name, "in Database:", $database-name, "to:", $value})
     
     let $config := admin:get-configuration()
@@ -188,7 +206,7 @@ declare function  inst-db-set:do-database-set-2($database-name, $set)
         else if ("word-query-two-character-searches"            eq $name) then admin:database-set-word-query-two-character-searches($config, $database-id, xs:boolean($value))
         else if ("word-query-word-searches"                     eq $name) then admin:database-set-word-query-word-searches($config, $database-id, xs:boolean($value))
         else if ("word-searches"                                eq $name) then admin:database-set-word-searches($config, $database-id, xs:boolean($value))
-        else    $config                                  
+        else    $config
         }
         catch ($e) {(xdmp:log(text{"### Skipping setting database property:",$name,"(may be an invalid value)->",$value}), $config)}
         
